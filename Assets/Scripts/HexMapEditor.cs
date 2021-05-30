@@ -11,7 +11,14 @@ public class HexMapEditor : MonoBehaviour {
 
 	Color activeColor;
 
-	public void SelectColor (int index) {
+	private int brushSize;
+	private bool applyColor;
+	private bool applyElevation = true;
+
+	public void SelectColor (int index) 
+	{
+		applyColor = index >= 0;
+		if(applyColor)
 		activeColor = colors[index];
 	}
 
@@ -36,12 +43,58 @@ public class HexMapEditor : MonoBehaviour {
 		Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if (Physics.Raycast(inputRay, out hit)) {
-			EditCell(hexGrid.GetCell(hit.point));
+			EditCells(hexGrid.GetCell(hit.point));
 		}
 	}
 
 	void EditCell (HexCell cell) {
-		cell.Color = activeColor;
-		cell.Elevation = activeElevation;
+		if (cell)
+		{
+
+
+			if (applyColor)
+			{
+				cell.Color = activeColor;
+			}
+			if (applyElevation)
+			{
+				cell.Elevation = activeElevation;
+			}
+		}
 	}
+
+	private void EditCells(HexCell center)
+    {
+		int CenterX = center.coordinates.X;
+		int centerZ = center.coordinates.Z;
+		for(int r = 0, z = centerZ - brushSize; z <= centerZ; z++, r++)
+        {
+			for(int x = CenterX - r; x <= CenterX + brushSize; x++)
+            {
+				EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
+            }
+        }
+		for(int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++)
+        {
+			for(int x = CenterX - brushSize; x <= CenterX + r; x++ )
+            {
+				EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
+            }
+        }
+    }
+
+	public void SetApplyElevation(bool toggle)
+    {
+		applyElevation = toggle;
+    }
+
+	public void SetBrushSize(float size)
+    {
+		brushSize = (int)size;
+    }
+
+	public void ShowUI(bool visible)
+    {
+		hexGrid.ShowUI((visible));
+    }
 }

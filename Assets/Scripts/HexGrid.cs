@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour {
@@ -61,7 +62,25 @@ public class HexGrid : MonoBehaviour {
 		return cells[index];
 	}
 
-	void CreateCell (int x, int z, int i) {
+    public HexCell GetCell(HexCoordinates hexCoordinates)
+    {
+		int z = hexCoordinates.Z;
+		if(z < 0 || z >= cellCountZ)
+        {
+			return null;
+        }
+		
+		int x = hexCoordinates.X + z / 2;
+		if(x < 0 || x >= cellCountX)
+        {
+			return null;
+        }
+
+		return cells[x + z * cellCountX];
+		//throw new NotImplementedException();
+    }
+
+    void CreateCell (int x, int z, int i) {
 		Vector3 position;
 		position.x = (x + z * 0.5f - z / 2) * (HexMetrics.innerRadius * 2f);
 		position.y = 0f;
@@ -90,7 +109,7 @@ public class HexGrid : MonoBehaviour {
 			}
 		}
 
-		Text label = Instantiate<Text>(cellLabelPrefab);
+        Text label = Instantiate<Text>(cellLabelPrefab);
 		label.rectTransform.anchoredPosition =
 			new Vector2(position.x, position.z);
 		label.text = cell.coordinates.ToStringOnSeparateLines();
@@ -110,4 +129,12 @@ public class HexGrid : MonoBehaviour {
 		int localZ = z - chunkZ * HexMetrics.chunkSizeZ;
 		chunk.AddCell(localX + localZ * HexMetrics.chunkSizeX, cell);
 	}
+
+	public void ShowUI(bool visible)
+    {
+		for(int i = 0; i < chunks.Length; i++)
+        {
+			chunks[i].ShowUI(visible);
+        }
+    }
 }

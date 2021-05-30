@@ -13,7 +13,13 @@ public class HexGridChunk : MonoBehaviour {
 		hexMesh = GetComponentInChildren<HexMesh>();
 
 		cells = new HexCell[HexMetrics.chunkSizeX * HexMetrics.chunkSizeZ];
+		ShowUI(false);
 	}
+
+	public void ShowUI(bool visible)
+    {
+		gridCanvas.gameObject.SetActive(visible);
+    }
 
 	public void AddCell (int index, HexCell cell) {
 		cells[index] = cell;
